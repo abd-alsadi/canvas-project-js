@@ -1,0 +1,214 @@
+<html>
+<head>
+    <title>h5viewer</title>
+    <script src="h5viewer.js"></script>
+    <style>
+        canvas:hover{
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <button id="firstPage">firstPage</button>
+        <button id="prevPage">prevPage</button>
+        <button id="currentPage">currentPage</button>
+        <button id="nextPage">nextPage</button>
+        <button id="lastPage">lastPage</button>
+        <button id="reset">reset</button>
+        <button id="clear">Clear</button>
+        <button id="render">Render</button>
+        <button id="zoomOut">zoomOut</button>
+        <button id="zoomIn">zoomIn</button>
+        <button id="flipH">flipH</button>
+        <button id="flipV">flipV</button>
+        <button id="rotateLeft">rotate left</button>
+        <button id="rotateRight">rotate rght</button>
+        <button id="extendV">extendV</button>
+        <button id="extendH">extendH</button>
+        <button id="extendBoth">extendBoth</button>
+    </div>
+    <div id="xx" style="width: 500px; height: 600px;position: relative;"></div>
+    <script>
+
+        function afterRender(){
+                var parentData = h5viewer.getParentData();
+                h5viewer.parent.style.overflowX="hidden";
+                h5viewer.parent.style.overflowY="hidden";
+               if(h5viewer.currnetRenderW>parentData.w){
+                h5viewer.parent.style.overflowX="scroll";
+               }
+               if(h5viewer.currnetRenderH>parentData.h){
+                h5viewer.parent.style.overflowY="scroll";
+               }
+
+        }
+        var degres = 0;
+        var zoom = 0.5;
+        var callbacks={
+            afterRender:afterRender
+        }
+        var h5viewer = new h5viewerJs("xx",callbacks);
+
+
+        var flipH=false;
+        var flipV = false;
+        var extendV=false;
+        var extendH = true;
+        var currentPage = 1;
+        var pages=[1,2,3,4];
+        function reset(){
+            flipV=false;
+            flipH=false;
+            extendV=false;
+            extendH=true;
+            zoom=0.5;
+            degres=0;
+            h5viewer.resetValues();
+            h5viewer.render();
+        }
+        function clear(){
+            flipV=false;
+            flipH=false;
+            zoom=0.5;
+            degres=0;
+            h5viewer.destroy();
+        }
+        function render(page){
+            reset();
+            h5viewer.loadImage(h5viewer,page,function(){
+                h5viewer.setRotate(degres);
+                h5viewer.setScale(zoom,zoom);
+                h5viewer.setFlipVertical(flipV);
+                h5viewer.setFlipHorizental(flipH);
+                h5viewer.setExtend(extendV,extendH);
+                h5viewer.render();
+            });
+          
+        }
+        function zoomIn(){
+         
+
+            if (zoom <1)
+            zoom=1;
+        else
+        zoom+=0.5;
+
+        dox();
+        }
+        function zoomOut(){
+           
+            if (zoom <1)
+            zoom=1;
+        else
+            zoom-=0.5;
+
+            dox();
+        }
+        function rotateRight(){
+            degres+=90;
+            if(degres >=360)
+            degres = 0;
+
+            dox();
+        }
+        function rotateLeft(){
+            degres-=90;
+            if(degres <=-360)
+            degres = 0;
+            dox();
+        }
+        function flipHX(){
+            flipH=!flipH;
+            dox();
+        }
+        function flipVX(){
+            flipV=!flipV;
+            dox();
+        }
+        function extendVX(){
+            extendV=!extendV;
+            dox();
+        }
+        function extendHX(){
+            extendH=!extendH;
+            dox();
+        }
+        function extendBoth(){
+            extendH=!extendH;
+            extendV=!extendV;
+            dox();
+        }
+        function dox(){
+            h5viewer.setRotate(degres);
+            h5viewer.setScale(zoom,zoom);
+            h5viewer.setFlipVertical(flipV);
+            h5viewer.setFlipHorizental(flipH);
+            h5viewer.setExtend(extendV,extendH)
+            h5viewer.render();
+        }
+        function checkPage(){
+            document.getElementById("firstPage").removeAttribute("disabled");
+                document.getElementById("prevPage").removeAttribute("disabled");
+                document.getElementById("nextPage").removeAttribute("disabled");
+                document.getElementById("lastPage").removeAttribute("disabled");
+            if(pages.length==1){
+                document.getElementById("firstPage").setAttribute("disabled",true);
+                document.getElementById("prevPage").setAttribute("disabled",true);
+                document.getElementById("nextPage").setAttribute("disabled",true);
+                document.getElementById("lastPage").setAttribute("disabled",true);
+            }
+            if(currentPage==1){
+                document.getElementById("firstPage").setAttribute("disabled",true);
+                document.getElementById("prevPage").setAttribute("disabled",true);
+            }else if(currentPage==pages.length){
+                document.getElementById("nextPage").setAttribute("disabled",true);
+                document.getElementById("lastPage").setAttribute("disabled",true);
+            }
+
+        }
+        function firstPage(){
+            currentPage=1;
+            goPage();
+            
+        }
+        function nextPage(){
+            currentPage=currentPage+1;
+            goPage();
+        }
+        function prevPage(){
+            currentPage=currentPage-1;
+            goPage();
+        }
+        function lastPage(){
+            currentPage=pages.length;
+            goPage();
+        }
+        function goPage(){
+            checkPage();
+            render(pages[currentPage-1]+".png");
+            document.getElementById("currentPage").innerText=currentPage+"/"+pages.length;
+        }
+
+        document.getElementById("reset").addEventListener("click",reset);
+        document.getElementById("clear").addEventListener("click",clear);
+        document.getElementById("render").addEventListener("click",render);
+        document.getElementById("zoomOut").addEventListener("click",zoomOut);
+        document.getElementById("zoomIn").addEventListener("click",zoomIn);
+        document.getElementById("rotateRight").addEventListener("click",rotateRight);
+        document.getElementById("rotateLeft").addEventListener("click",rotateLeft);
+        document.getElementById("flipH").addEventListener("click",flipHX);
+        document.getElementById("flipV").addEventListener("click",flipVX);
+        document.getElementById("extendV").addEventListener("click",extendVX);
+        document.getElementById("extendH").addEventListener("click",extendHX);
+        document.getElementById("extendBoth").addEventListener("click",extendBoth);
+        document.getElementById("prevPage").addEventListener("click",prevPage);
+        document.getElementById("firstPage").addEventListener("click",firstPage);
+        document.getElementById("nextPage").addEventListener("click",nextPage);
+        document.getElementById("lastPage").addEventListener("click",lastPage);
+
+        goPage();
+    </script>
+</body>
+</html>

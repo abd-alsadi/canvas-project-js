@@ -1,0 +1,620 @@
+<html>
+
+<head>
+    <title>h5viewer</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="style/htmlshape.css">
+    <link rel="stylesheet" href="style/viewer.css">
+
+    <script src="style/emojy.js"></script>
+    <script src="style/shapes.js"></script>
+    <script src="style/htmlshape.js"></script>
+    <script src="style/h5viewer.js"></script>
+
+</head>
+
+<body>
+    <div id="h5viewer">
+        <div id="commands">
+            <div style="border: 1px solid grey; color: black;">
+                <input id="upload" type="file" />
+                <i id="firstPage" class="material-icons manual">first_page</i>
+                <i id="prevPage" class="material-icons manual">navigate_before</i>
+                <i id="currentPage" class="material-icons manual"
+                    style="font-size: 20px; font-family:Arial, Helvetica, sans-serif"></i>
+                <i id="nextPage" class="material-icons manual">navigate_next</i>
+                <i id="lastPage" class="material-icons manual">last_page</i>
+                <i id="zoomIn" class="material-icons manual">zoom_in</i>
+                <i id="zoomOut" class="material-icons manual">zoom_out</i>
+                <i id="rotateLeft" class="material-icons manual">rotate_left</i>
+                <i id="rotateRight" class="material-icons manual">rotate_right</i>
+                <i id="flipV" class="material-icons manual">border_vertical</i>
+                <i id="flipH" class="material-icons manual">border_horizontal</i>
+                <i id="extendV" class="material-icons manual">swap_vert</i>
+                <i id="extendH" class="material-icons manual">swap_horiz</i>
+                <i id="extendBoth" class="material-icons manual">vertical_align_center</i>
+                <i id="download" class="material-icons manual">file_download</i>
+                <i id="clear" class="material-icons manual">clear</i>
+                <i id="render" class="material-icons manual">refresh</i>
+                <select id="drawMode">
+                    <option value="draw">draw</option>
+                    <option value="dbclick">dbclick</option>
+                </select>
+                <select id="drawType">
+                    <option value="oval">oval</option>
+                    <option value="rect">Rectangle</option>
+                    <option value="image">Image</option>
+                    <option value="line">line</option>
+                    <option value="emojy">emojy</option>
+                    <option value="text">text</option>
+                    <option value="hand">hand</option>
+                </select>
+                <select id="emoType">
+                </select>
+            </div>
+            <br />
+            <div style="border: 1px solid grey;">
+                <label> linewidth:</label>
+                <select id="style_linewidth">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                    <option value="6">6</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                </select>
+                <label> opacity:</label>
+                <select id="style_opacity">
+                    <option value="100">100</option>
+                    <option value="90">90</option>
+                    <option value="80">80</option>
+                    <option value="70">70</option>
+                    <option value="60">60</option>
+                    <option value="50">50</option>
+                    <option value="40">40</option>
+                    <option value="30">30</option>
+                    <option value="20">20</option>
+                    <option value="10">10</option>
+                </select>
+                <label> fillMode:</label>
+                <select id="style_fillMode">
+                    <option value="true">Fill</option>
+                    <option value="false">Stroke</option>
+                </select>
+                <label> color:</label>
+                <select id="style_colors">
+                    <option value="red">red</option>
+                    <option value="blue">blue</option>
+                </select>
+                <label> fontsize:</label>
+                <select id="style_fontsize">
+                    <option value="10">10</option>
+                    <option value="12">12</option>
+                    <option value="14">14</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30">30</option>
+                </select>
+                <label> direction:</label>
+                <select id="style_direction">
+                    <option value="rtl">rtl</option>
+                    <option value="ltr">ltr</option>
+                </select>
+                <label> textalign:</label>
+                <select id="style_textalign">
+                    <option value="start">start</option>
+                    <option value="center">center</option>
+                    <option value="end">end</option>
+                </select>
+                <label> textbaseline:</label>
+                <select id="style_textbaseline">
+                    <option value="top">top</option>
+                    <option value="middle">middle</option>
+                    <option value="bottom">bottom</option>
+                </select>
+
+            </div>
+            <br />
+            <div style="border: 1px solid grey;">
+                <button id="removeAllShapes">removeAllShapes</button>
+                <button id="getSelection">getSelection</button>
+                <button id="showThumbs">showThumbs</button>
+            </div>
+        </div>
+
+        <div id="viewer" style="display: flex;">
+            <div id="thumbs" style="border: 1px solid grey; height: 500px; overflow-y: scroll;"></div>
+
+            <div id="container" style="width: 1000px; height: 500px;position: relative; background-color: darkgray;">
+                <div id="loading" class="loader">
+                    <img src="style/loading.gif" width="100" height="100" />
+                </div>
+                <div id="contextMenu_shape" class="context-menu" style="display: none">
+                    <ul>
+                        <li id="contextmenu_delete_selection_shape"><a href="#">delete</a></li>
+                        <li id="contextmenu_cut_selection_shape"><a href="#">cut</a></li>
+                        <li id="contextmenu_copy_selection_shape"><a href="#">copy</a></li>
+                        <li id="contextmenu_paste_selection_shape"><a href="#">paste</a></li>
+                    </ul>
+                </div>
+                <div id="contextMenu_canvas" class="context-menu" style="display: none">
+                    <ul>             
+                        <li id="contextmenu_add_html_shape"><a href="#"> add html shape</a></li>
+                        <li id="contextmenu_2"><a href="#">2</a></li>
+                        <li id="contextmenu_3"><a href="#">3</a></li>
+                        <li id="contextmenu_4"><a href="#">4</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+        var htmlElements=[];
+        var currentMouseContextMenu=null;
+        var h5viewer = null;
+        var flipH = false;
+        var flipV = false;
+        var extendV = false;
+        var extendH = false;
+        var currentPage = 1;
+        var pages = [1, 2, 3, 4, 5, 6, 7];
+
+        var degres = 0;
+        var zoom = 0.5;
+        var callbacks = {
+            afterRender: afterRender,
+            afterLoadImage: afterLoadImage,
+            closeAllContextMenu: closeAllContextMenu,
+            openContextMenu: openContextMenu
+        }
+
+ 
+        //----------------- options canvas -------------------
+
+        function firstPage() {
+            currentPage = 1;
+            goPage();
+        }
+        function nextPage() {
+            currentPage = currentPage + 1;
+            goPage();
+        }
+        function prevPage() {
+            currentPage = currentPage - 1;
+            goPage();
+        }
+        function lastPage() {
+            currentPage = pages.length;
+            goPage();
+        }
+       
+
+        function zoomIn() {
+            if (zoom < 1)
+                zoom = 1;
+            else
+                zoom += 0.5;
+
+            refresh();
+        }
+        function zoomOut() {
+            if (zoom < 1)
+                zoom = 1;
+            else
+                zoom -= 0.5;
+
+            refresh();
+        }
+        function rotateRight() {
+            degres += 90;
+            if (degres >= 360)
+                degres = 0;
+
+            refresh();
+        }
+        function rotateLeft() {
+            degres -= 90;
+            if (degres <= -360)
+                degres = 0;
+            refresh();
+        }
+        function flipHX() {
+            flipH = !flipH;
+            refresh();
+        }
+        function flipVX() {
+            flipV = !flipV;
+            refresh();
+        }
+        function extendVX() {
+            extendV = !extendV;
+            refresh();
+        }
+        function extendHX() {
+            extendH = !extendH;
+            refresh();
+        }
+        function extendBoth() {
+            extendH = !extendH;
+            extendV = !extendV;
+            refresh();
+        }
+        function getSelection() {
+            console.log(h5viewer.currentSelectionShape);
+        }
+
+        function removeAllShapes() {
+            debugger
+            h5viewer.removeAllShapes();
+            removeAllHtmlElements();
+
+        }
+        function download() {
+            h5viewer.download();
+        }
+        function upload(e) {
+            var url = URL.createObjectURL(this.files[0]);
+            changeState(url);
+        }
+
+        function openContextMenu(e, menuID, pos) {
+            debugger
+            closeAllContextMenu(e);
+            e.preventDefault();
+            var menu = document.getElementById(menuID);
+            if (menu) {
+                menu.style.display = 'block';
+                menu.style.left = pos.x + "px";
+                menu.style.top = pos.y + "px";
+            }
+            currentMouseContextMenu = pos;
+        }
+        function closeAllContextMenu(e) {
+            var menuCanvas = document.getElementById('contextMenu_canvas');
+            if (menuCanvas)
+                menuCanvas.style.display = 'none';
+
+            var menuShape = document.getElementById('contextMenu_shape');
+            if (menuShape)
+                menuShape.style.display = 'none';
+
+        }
+     
+        function contextmenu_add_html_shape(){
+            closeAllContextMenu();
+            addHtmlElement({left:currentMouseContextMenu.x,top:currentMouseContextMenu.y});
+        }
+        function contextMenuItem_delete_selection_shape(e) {
+            h5viewer.contextMenuCommand(e, 'shape', 'delete_selection_shape');
+        }
+        function contextMenuItem_cut_selection_shape(e) {
+            h5viewer.contextMenuCommand(e, 'shape', 'cut_selection_shape');
+        }
+        function contextMenuItem_copy_selection_shape(e) {
+            h5viewer.contextMenuCommand(e, 'shape', 'copy_selection_shape');
+        }
+        function contextMenuItem_paste_selection_shape(e) {
+            h5viewer.contextMenuCommand(e, 'shape', 'paste_selection_shape');
+        }
+       
+        function changeOption(e) {
+            changeState();
+        }
+        function clickThumb(e) {
+            var page = e.target.tabIndex;
+            currentPage = page;
+            goPage();
+        }
+
+        function showThumbs() {
+            var ok = document.getElementById('thumbs').style.display;
+            if (ok) {
+                document.getElementById('thumbs').style.display = "";
+            } else {
+                document.getElementById('thumbs').style.display = "none";
+            }
+        }
+
+        function refresh() {
+            h5viewer.setRotate(degres);
+            h5viewer.setScale(zoom, zoom);
+            h5viewer.setFlipVertical(flipV);
+            h5viewer.setFlipHorizental(flipH);
+            h5viewer.setExtend(extendV, extendH);
+            h5viewer.refresh();
+        }
+
+        function render(page) {
+            showLoading(true);
+            setTimeout(function () {
+                h5viewer = new h5viewerJs("container", callbacks);
+                reset();
+                h5viewer.loadImage(page);
+            }, 2000);
+
+        }
+
+        function goPage() {
+            checkPage();
+            render("images/"+pages[currentPage - 1] + ".png");
+            document.getElementById("currentPage").innerText = currentPage + "/" + pages.length;
+        }
+    
+
+       
+
+
+
+        //--------------------- utils -----------------    
+
+        function reset() {
+            flipV = false;
+            flipH = false;
+            extendV = false;
+            extendH = false;
+            zoom = 0.5;
+            degres = 0;
+            removeAllHtmlElements();
+            h5viewer.resetValues();
+            changeState();
+        }
+
+        function loadEmo() {
+            if (emojis && emojis.emojis) {
+                var str = "";
+                var data = emojis.emojis;
+                for (var index = 0; index < data.length; index++) {
+                    var emo = data[index];
+                    str += '<option value="' + emo.emoji + '">' + emo.emoji + '</option>\n';
+                }
+                document.getElementById('emoType').innerHTML = str;
+            }
+
+        }
+
+        function afterRender() {
+            var imageData = h5viewer.getImageData();
+            var parentData = h5viewer.getParentData();
+            h5viewer.parent.style.overflow = "hidden";
+            if (h5viewer.currnetRenderW > parentData.w) {
+                h5viewer.parent.style.overflowX = "scroll";
+            }
+            if (h5viewer.currnetRenderH > parentData.h) {
+                h5viewer.parent.style.overflowY = "scroll";
+            }
+
+            h5viewer.setContextMenuID("contextMenu_canvas", "contextMenu_shape");
+
+        }
+  
+        function getDefaultSettingsAndStyles() {
+            var settings = new Object();
+            settings.isAllowSelect = true;
+            settings.isAllowResize = true;
+            settings.isAllowMove = true;
+            settings.selectionColor = 'grey';
+            settings.selectionWidth = 2;
+            settings.selectionBoxColor = 'grey'; // New for selection boxes
+            settings.selectionBoxSize = 6;
+            settings.page = currentPage;
+            var style = {
+                font: "20px Arial",
+                lineWidth: 4,
+                strokeStyle: "blue",
+                textBaseline: "middle",
+                textAlign: "start",
+                fillStyle: "red",
+            };
+            return {
+                settings: settings,
+                style: style,
+                fill: true,
+            }
+        }
+        function afterLoadImage() {
+            h5viewer.resetValues();
+            //h5viewer.refresh();
+            h5viewer.setRotate(degres);
+            showLoading(false);
+            h5viewer.setScale(zoom, zoom);
+            h5viewer.setFlipVertical(flipV);
+            h5viewer.setFlipHorizental(flipH);
+            h5viewer.setExtend(extendV, extendH);
+            changeState();
+            h5viewer.refresh();
+           // loadHtmlElements();
+        }
+        function showLoading(ok) {
+            if (ok) {
+                document.getElementById('commands').style.pointerEvents = 'none';
+                document.getElementById("loading").style.display = '';
+            } else {
+                document.getElementById('commands').style.pointerEvents = '';
+                document.getElementById("loading").style.display = 'none';
+            }
+        }
+        function changeState(url) {
+            var settings = getDefaultSettingsAndStyles();
+            var style_colors = document.getElementById('style_colors').value;
+            var style_fillMode = document.getElementById('style_fillMode').value;
+            if (style_fillMode == 'true') {
+                style_fillMode = true;
+            } else {
+                style_fillMode = false;
+            }
+            var style_fontsize = document.getElementById('style_fontsize').value;
+            var style_direction = document.getElementById('style_direction').value;
+            var style_textalign = document.getElementById('style_textalign').value;
+            var style_linewidth = Number(document.getElementById('style_linewidth').value);
+            var style_opacity = Number(document.getElementById('style_opacity').value);
+            var style_textbaseline = document.getElementById('style_textbaseline').value;
+
+            settings.fill = style_fillMode;
+            settings.page = currentPage;
+            settings.style = {
+                font: style_fontsize + "px Arial",
+                lineWidth: style_linewidth,
+                strokeStyle: style_colors,
+                textBaseline: style_textbaseline,
+                textAlign: style_textalign,
+                textDirection: style_direction,
+                fillStyle: style_colors,
+                opacity: style_opacity
+            };
+            var mode = document.getElementById('drawMode').value;
+            var drawType = document.getElementById('drawType').value;
+            var emoType = document.getElementById('emoType').value;
+            var data = {};
+            switch (drawType) {
+                case 'rect', 'oval', 'line':
+                    break;
+                case 'image':
+                    data = { image: (!url ? "https://media.istockphoto.com/id/517188688/photo/mountain-landscape.jpg?s=612x612&w=0&k=20&c=A63koPKaCyIwQWOTFBRWXj_PwCrR4cEoOw2S9Q7yVl8=" : url) };
+                    break;
+                case 'text':
+                    data = { text: 'text test' };
+                    break;
+                case 'emojy':
+                    data = { emojy: emoType };
+                    break;
+            }
+
+            var state = { mode: mode, shapeType: drawType, data: data }
+            h5viewer.setState(state, settings);
+        } 
+      
+      
+        function checkPage() {
+            document.getElementById("firstPage").removeAttribute("disabled");
+            document.getElementById("prevPage").removeAttribute("disabled");
+            document.getElementById("nextPage").removeAttribute("disabled");
+            document.getElementById("lastPage").removeAttribute("disabled");
+            if (pages.length == 1) {
+                document.getElementById("firstPage").setAttribute("disabled", true);
+                document.getElementById("prevPage").setAttribute("disabled", true);
+                document.getElementById("nextPage").setAttribute("disabled", true);
+                document.getElementById("lastPage").setAttribute("disabled", true);
+            }
+            if (currentPage == 1) {
+                document.getElementById("firstPage").setAttribute("disabled", true);
+                document.getElementById("prevPage").setAttribute("disabled", true);
+            } else if (currentPage == pages.length) {
+                document.getElementById("nextPage").setAttribute("disabled", true);
+                document.getElementById("lastPage").setAttribute("disabled", true);
+            }
+
+        }
+        function loadThumbs() {
+            document.getElementById('thumbs').innerHTML = "";
+            for (var i = 0; i < pages.length; i++) {
+                var thumb = document.createElement('div');
+                var label = document.createElement('span');
+                label.innerText = (i + 1);
+
+                var img = document.createElement('img');
+                img.style.width = 100;
+                img.style.height = 100;
+                img.src = "images/"+(i + 1) + ".png";
+                img.tabIndex = i + 1;
+                img.style.border = '2px solid grey';
+                thumb.onclick = function (e) {
+                    clickThumb(e);
+                };
+                thumb.style.textAlign = 'center';
+                thumb.appendChild(img);
+                thumb.appendChild(document.createElement('br'));
+                thumb.appendChild(label);
+
+                document.getElementById('thumbs').appendChild(thumb);
+            }
+        }
+    
+        function deleteHtmlElement(htmlShape){
+            var index = htmlElements.findIndex(e => e.elementID == htmlShape.elementID);
+            if (index > -1) {
+                htmlElements.splice(index, 1);
+                htmlShape.element.remove();
+            }
+        }
+        function removeAllHtmlElements(){
+            for(var index=0;index<htmlElements.length;index++){
+                htmlElements[index].element.remove();
+            }
+            htmlElements=[];
+        }
+       function addHtmlElement(position){
+            var callbacks = {deleteCallback:deleteHtmlElement};
+            var htmlShape = new HtmlShape(callbacks);
+            var elementID= generateID();
+            var elementHeaderID = elementID+'_header';
+            htmlShape.loadHtml('<input type="text" value="write here"/> <p>Move</p> <p>Move</p> <p>Move</p> <input type="text" value="write here"/>','container',elementID,elementHeaderID,position);
+            htmlElements.push(htmlShape);
+       }
+       
+       function generateID(){
+            var d = new Date().getTime();//Timestamp
+            return d;
+       }
+        function loadHtmlElements(){
+          addHtmlElement({left:100,top:100});
+          addHtmlElement({left:100,top:200});
+        }
+        function loadMain() {
+            document.getElementById("upload").addEventListener("change", upload);
+            document.getElementById("showThumbs").addEventListener("click", showThumbs);
+            document.getElementById("download").addEventListener("click", download);
+            document.getElementById("removeAllShapes").addEventListener("click", removeAllShapes);
+            document.getElementById("clear").addEventListener("click", reset);
+            document.getElementById("render").addEventListener("click", refresh);
+            document.getElementById("zoomOut").addEventListener("click", zoomOut);
+            document.getElementById("zoomIn").addEventListener("click", zoomIn);
+            document.getElementById("rotateRight").addEventListener("click", rotateRight);
+            document.getElementById("rotateLeft").addEventListener("click", rotateLeft);
+            document.getElementById("flipH").addEventListener("click", flipHX);
+            document.getElementById("flipV").addEventListener("click", flipVX);
+            document.getElementById("extendV").addEventListener("click", extendVX);
+            document.getElementById("extendH").addEventListener("click", extendHX);
+            document.getElementById("extendBoth").addEventListener("click", extendBoth);
+            document.getElementById("prevPage").addEventListener("click", prevPage);
+            document.getElementById("firstPage").addEventListener("click", firstPage);
+            document.getElementById("nextPage").addEventListener("click", nextPage);
+            document.getElementById("lastPage").addEventListener("click", lastPage);
+            document.getElementById("getSelection").addEventListener("click", getSelection);
+            document.getElementById("drawMode").addEventListener("change", changeOption);
+            document.getElementById("drawType").addEventListener("change", changeOption);
+            document.getElementById("emoType").addEventListener("change", changeOption);
+
+            document.getElementById("style_colors").addEventListener("change", changeOption);
+            document.getElementById("style_fillMode").addEventListener("change", changeOption);
+            document.getElementById("style_fontsize").addEventListener("change", changeOption);
+            document.getElementById("style_direction").addEventListener("change", changeOption);
+            document.getElementById("style_textalign").addEventListener("change", changeOption);
+            document.getElementById("style_textbaseline").addEventListener("change", changeOption);
+            document.getElementById("style_linewidth").addEventListener("change", changeOption);
+            document.getElementById("style_opacity").addEventListener("change", changeOption);
+
+
+            document.getElementById("contextmenu_delete_selection_shape").addEventListener("click", contextMenuItem_delete_selection_shape);
+            document.getElementById("contextmenu_cut_selection_shape").addEventListener("click", contextMenuItem_cut_selection_shape);
+            document.getElementById("contextmenu_copy_selection_shape").addEventListener("click", contextMenuItem_copy_selection_shape);
+            document.getElementById("contextmenu_paste_selection_shape").addEventListener("click", contextMenuItem_paste_selection_shape);
+
+
+            document.getElementById("contextmenu_add_html_shape").addEventListener("click", contextmenu_add_html_shape);
+
+            loadEmo();
+            goPage();
+            loadThumbs();
+           // loadHtmlElements();
+        }
+        
+      
+        loadMain();
+    </script>
+</body>
+
+</html>

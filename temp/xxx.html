@@ -1,0 +1,283 @@
+<html>
+
+<head>
+    <style>
+ 
+ .popup {
+  z-index: 9;
+  background-color: #f1f1f1;
+  border: 1px solid #d3d3d3;
+  text-align: center;
+  min-height: 150px;
+  min-width: 300px;
+  max-height: 300px;
+  max-width: 600px;
+}
+
+/*Drgable */
+
+.popup {
+  position: absolute;
+  /*resize: both; !*enable this to css resize*! */
+  overflow: auto;
+}
+
+.popup-header {
+  padding: 10px;
+  cursor: move;
+  z-index: 10;
+  background-color: #2196f3;
+  color: #fff;
+}
+
+/*Resizeable*/
+
+.popup .resizer-right {
+  width: 5px;
+  height: 100%;
+  background: transparent;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: e-resize;
+}
+
+.popup .resizer-bottom {
+  width: 100%;
+  height: 5px;
+  background: transparent;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: n-resize;
+}
+
+.popup .resizer-both {
+  width: 5px;
+  height: 5px;
+  background: transparent;
+  z-index: 10;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: nw-resize;
+}
+
+/*NOSELECT*/
+
+.popup * {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
+
+    </style>
+</head>
+
+<body id="container">
+    <div class="popup" id="popup">
+        <div class="popup-header" id="header">Click here to move</div>
+        <p>Move</p>
+        <p>this</p>
+        <p>DIV</p>
+      </div>
+      
+      <div class="popup" id="popup2">
+        <div class="popup-header noselect" id="header2">Click here to move</div>
+        <p>Move</p>
+        <p>this</p>
+        <p>DIV</p>
+
+      </div>
+
+<script>
+    var xx,yy,vv,vvv;
+    window.onload = function() {
+         xx = new HtmlShape('container','popup','header',{left:100,top:100});
+         yy = new HtmlShape('container','popup2','header2');
+         xx.apply();
+         yy.apply();
+};
+
+
+
+
+class HtmlShape{
+    constructor(containerID,elementID,elementHeaderID,position){
+        this.containerID=containerID;
+        this.elementID=elementID;
+        this.elementHeaderID=elementHeaderID;
+        this.position=position;
+    }
+    apply(){
+        this.dragElement=new DragElement(this.containerID,this.elementID,this.elementHeaderID,this.position);
+        this.resizeElement=new ResizElement(this.containerID,this.elementID,this.position);
+    }
+}
+class DragElement{
+    constructor(containerID,elementID,elementHeaderID,position){
+        this.element = document.getElementById(elementID);
+        this.elementHeader = document.getElementById(elementHeaderID);
+        this.container = document.getElementById(containerID);
+
+        if(this.element && this.elementHeader && this.container){
+            if(position && position.left){
+                this.element.style.left=position.left;
+            }
+            if(position && position.top){
+                this.element.style.top=position.top;
+            }
+            if(position && position.right){
+                this.element.style.right=position.right;
+            }
+            if(position && position.bottom){
+                this.element.style.bottom=position.bottom;
+            }
+            this.initDragElement(elementID,elementHeaderID);
+        }
+           
+    }
+
+
+    initDragElement(elementID,elementHeaderID){
+         this.pos1 = 0,this.pos2 = 0,this.pos3 = 0,this.pos4 = 0;
+         this.currentZIndex = 100; //TODO reset z index when a threshold is passed
+
+        this.element.onmousedown = function() {
+            this.style.zIndex = "" + ++this.currentZIndex;
+        };
+
+        if (this.elementHeader) {
+            this.elementHeader.onmousedown = this.startDragElement.bind(this);
+        }
+    }
+
+    stopDragElement() {
+        console.log('stopDragElement');
+        /* stop moving when mouse button is released:*/
+        this.container.onmouseup = null;
+        this.container.onmousemove = null;
+    }
+
+ 
+    dragElementMove(e) {
+        if (!this.element) {
+        return;
+        }
+        
+        console.log('dragElementMove');
+
+        e = e || window.event;
+        // calculate the new cursor position:
+        this.pos1 = this.pos3 - e.clientX;
+        this.pos2 = this.pos4 - e.clientY;
+        this.pos3 = e.clientX;
+        this.pos4 = e.clientY;
+        // set the element's new position:
+        this.element.style.top = this.element.offsetTop - this.pos2 + "px";
+        this.element.style.left = this.element.offsetLeft - this.pos1 + "px";
+
+        console.log("pos1:"+this.pos1+" pos2:"+this.pos2+" pos3:"+this.pos3+" pos4:"+this.pos4);
+
+  }
+  
+   startDragElement(e) {
+    console.log('startDragElement');
+
+    this.element.style.zIndex = "" + ++this.currentZIndex;
+    e = e || window.event;
+    // get the mouse cursor position at startup:
+    this.pos3 = e.clientX;
+    this.pos4 = e.clientY;
+    this.container.onmouseup = this.stopDragElement.bind(this);
+    // call a function whenever the cursor moves:
+    this.container.onmousemove = this.dragElementMove.bind(this);
+  }
+
+}
+
+class ResizElement{
+    constructor(containerID,elementID,position){
+        this.element = document.getElementById(elementID);
+        this.container = document.getElementById(containerID);
+        if(this.element && this.container){
+            if(position && position.left){
+                this.element.style.left=position.left;
+            }
+            if(position && position.top){
+                this.element.style.top=position.top;
+            }
+            if(position && position.right){
+                this.element.style.right=position.right;
+            }
+            if(position && position.bottom){
+                this.element.style.bottom=position.bottom;
+            }
+
+            this.initResizeElement();
+        }
+        
+    }
+    initResizeElement(){
+       this.startX, this.startY, this.startWidth, this.startHeight;
+       
+        this.buildPointers();
+    }
+    buildPointers(){
+        var right = document.createElement("div");
+        right.className = "resizer-right";
+        this.element.appendChild(right);
+        right.addEventListener("mousedown", this.initDrag.bind(this), false);
+       // right.parentPopup = p;
+
+        var bottom = document.createElement("div");
+        bottom.className = "resizer-bottom";
+        this.element.appendChild(bottom);
+        bottom.addEventListener("mousedown", this.initDrag.bind(this), false);
+       // bottom.parentPopup = p;
+
+        var both = document.createElement("div");
+        both.className = "resizer-both";
+        this.element.appendChild(both);
+        both.addEventListener("mousedown", this.initDrag.bind(this), false);
+        //both.parentPopup = p;
+    }
+
+ initDrag(e) {
+     //this.element = e.target.parentPopup;
+
+    this.startX = e.clientX;
+    this.startY = e.clientY;
+    this.startWidth = parseInt(
+      document.defaultView.getComputedStyle(this.element).width,
+      10
+    );
+    this.startHeight = parseInt(
+      document.defaultView.getComputedStyle(this.element).height,
+      10
+    );
+    this.container.onmousemove=this.doDrag.bind(this);
+    this.container.onmouseup=this.stopDrag.bind(this);
+  }
+
+ doDrag(e) {
+    this.element.style.width =  this.startWidth + e.clientX -  this.startX + "px";
+    this.element.style.height = this. startHeight + e.clientY -  this.startY + "px";
+  }
+
+   stopDrag() {
+    this.container.onmousemove=null;
+    this.container.onmouseup=null;
+  }
+}
+
+
+
+</script>
+</body>
+</html>
